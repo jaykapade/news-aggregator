@@ -6,7 +6,7 @@ const HomePage: React.FC = () => {
   const [articles, setArticles] = useState<any[]>([]);
 
   useEffect(() => {
-    getTopHeadlines({ country: "us" }).then((data) =>
+    getTopHeadlines({ country: "in" }).then((data) =>
       setArticles(data.articles)
     );
   }, []);
