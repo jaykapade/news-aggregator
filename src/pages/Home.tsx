@@ -12,9 +12,9 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className="p-4">
       <h1>Top Headlines</h1>
-      <div className="articles">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {articles.map((article, index) => (
           <NewsCard key={index} {...article} />
         ))}
