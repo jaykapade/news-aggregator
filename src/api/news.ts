@@ -12,7 +12,7 @@ const newsOrgApi = axios.create({
 const newsApi = axios.create({
   baseURL: "https://newsapi.org/v2",
   headers: {
-    Authorization: `Bearer ${API_KEY}`,
+    Authorization: `Bearer ${NEWS_ORG_API_KEY}`,
   },
 });
 

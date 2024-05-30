@@ -4,12 +4,12 @@ import { getTopHeadlines } from "../api/news";
 import Loader from "../components/Loader";
 
 const HomePage: React.FC = () => {
+  const PAGE_SIZE = 16;
   const loaderRef = useRef(null);
   const [articles, setArticles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  console.log("🚀 ~ totalResults:", totalResults);
   const [query, setQuery] = useState({
     search: "",
     category: "",
@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const params: any = { country: "us", pageSize: 20, page: offset };
+      const params: any = { country: "us", pageSize: PAGE_SIZE, page: 1 };
       if (query.search) params["q"] = query.search;
       if (query.category) params["category"] = query.category;
       // if (query.source) params["sources"] = query.source;
@@ -29,8 +29,9 @@ const HomePage: React.FC = () => {
       setIsLoading(true);
       try {
         const data = await getTopHeadlines(params);
-        setArticles((prev) => [...prev, ...data.articles]);
+        setArticles(data.articles);
         console.log("data", data);
+        setOffset(1);
         setTotalResults(data.totalResults);
       } catch (error) {
         console.error(error);
@@ -40,12 +41,39 @@ const HomePage: React.FC = () => {
     }
 
     fetchData();
-  }, [query, offset]);
+  }, [query]);
+
+  useEffect(() => {
+    if (offset > 1) {
+      const params: any = { country: "us", pageSize: PAGE_SIZE, page: offset };
+      if (query.search) params["q"] = query.search;
+      if (query.category) params["category"] = query.category;
+      // if (query.source) params["sources"] = query.source;
+      if (query.from) params["from"] = query.from;
+      if (query.to) params["to"] = query.to;
+      setIsLoading(true);
+      getTopHeadlines(params)
+        .then((data) => {
+          setArticles((prev) => [...prev, ...data.articles]);
+          setOffset((prev) => prev + 1);
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [offset]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const target = entries[0];
-      if (target.isIntersecting && offset * 16 < totalResults && !isLoading) {
+      if (
+        target.isIntersecting &&
+        offset * PAGE_SIZE < totalResults &&
+        !isLoading
+      ) {
         setOffset((prev) => prev + 1);
       }
     });
@@ -69,7 +97,6 @@ const HomePage: React.FC = () => {
           type="search"
           value={query.search}
           onChange={(e) => {
-            setOffset(1);
             setQuery((prev) => ({ ...prev, search: e.target.value }));
           }}
           placeholder="Search for articles..."
@@ -79,7 +106,6 @@ const HomePage: React.FC = () => {
           type="date"
           value={query.from}
           onChange={(e) => {
-            setOffset(1);
             setQuery((prev) => ({ ...prev, from: e.target.value }));
           }}
           placeholder="Search for articles..."
@@ -89,7 +115,6 @@ const HomePage: React.FC = () => {
           type="date"
           value={query.to}
           onChange={(e) => {
-            setOffset(1);
             setQuery((prev) => ({ ...prev, to: e.target.value }));
           }}
           placeholder="Search for articles..."
@@ -126,7 +151,6 @@ const HomePage: React.FC = () => {
         </select>
         <button
           onClick={() => {
-            setOffset(1);
             setQuery({
               search: "",
               category: "",
