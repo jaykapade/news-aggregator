@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import NewsCard from "../components/NewsCard";
-import { getTopHeadlines } from "../api/news";
+import { getNews } from "../api/news";
 import Loader from "../components/Loader";
 
 const HomePage: React.FC = () => {
-  const PAGE_SIZE = 16;
+  const PAGE_SIZE = 5;
   const loaderRef = useRef(null);
   const [articles, setArticles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [query, setQuery] = useState({
+  const [query, setQuery] = useState<any>({
     search: "",
     category: "",
-    source: "",
+    source: "newsOrgApi",
     from: "",
     to: "",
   });
@@ -28,7 +28,7 @@ const HomePage: React.FC = () => {
       if (query.to) params["to"] = query.to;
       setIsLoading(true);
       try {
-        const data = await getTopHeadlines(params);
+        const data = await getNews(params, query.source);
         setArticles(data.articles);
         console.log("data", data);
         setOffset(1);
@@ -44,25 +44,28 @@ const HomePage: React.FC = () => {
   }, [query]);
 
   useEffect(() => {
-    if (offset > 1) {
+    async function fetchData() {
       const params: any = { country: "us", pageSize: PAGE_SIZE, page: offset };
       if (query.search) params["q"] = query.search;
       if (query.category) params["category"] = query.category;
       // if (query.source) params["sources"] = query.source;
       if (query.from) params["from"] = query.from;
       if (query.to) params["to"] = query.to;
-      setIsLoading(true);
-      getTopHeadlines(params)
-        .then((data) => {
-          setArticles((prev) => [...prev, ...data.articles]);
-          setOffset((prev) => prev + 1);
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      try {
+        setIsLoading(true);
+        const data = await getNews(params, query.source);
+        setArticles([...articles, ...data.articles]);
+        console.log("data", data);
+        setTotalResults(data.totalResults);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (offset > 1 && !isLoading) {
+      fetchData();
     }
   }, [offset]);
 
@@ -87,7 +90,7 @@ const HomePage: React.FC = () => {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [totalResults, offset, isLoading]);
+  }, [totalResults, offset]);
 
   return (
     <div className="p-4 flex flex-col gap-4">
