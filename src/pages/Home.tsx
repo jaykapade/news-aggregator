@@ -54,7 +54,7 @@ const HomePage: React.FC = () => {
       try {
         setIsLoading(true);
         const data = await getNews(params, query.source);
-        setArticles([...articles, ...data.articles]);
+        setArticles((prev) => [...prev, ...data.articles]);
         console.log("data", data);
         setTotalResults(data.totalResults);
       } catch (error) {
@@ -64,7 +64,7 @@ const HomePage: React.FC = () => {
       }
     }
 
-    if (offset > 1 && !isLoading) {
+    if (offset > 1) {
       fetchData();
     }
   }, [offset]);
