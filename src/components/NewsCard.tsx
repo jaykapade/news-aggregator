@@ -6,6 +6,7 @@ type NewsCardProps = {
   url: string;
   urlToImage: string;
   publishedAt: string;
+  author?: string;
 };
 
 const NewsCard: React.FC<NewsCardProps> = ({
@@ -14,16 +15,26 @@ const NewsCard: React.FC<NewsCardProps> = ({
   url,
   urlToImage,
   publishedAt,
+  author = "",
 }) => {
+  const dateAndAuthor = `${new Date(publishedAt).toLocaleDateString()} ${
+    author ? `| ${author}` : ""
+  }`;
   return (
-    <article className="flex flex-col max-w-[24rem] shadow-md rounded-xl overflow-hidden hover:shadow-2xl ease-in-out">
+    <article className="flex flex-col max-w-[24rem] shadow-md rounded-xl overflow-hidden hover:shadow-2xl ease-in-out gap-2">
       <img
-        src={urlToImage}
+        src={urlToImage || "https://placehold.co/600x400"}
         alt={title}
         className="object-cover h-[16rem] max-h-[16rem] min-h-[16rem]"
       />
-      <div className="p-4 flex flex-col gap-1 h-full w-full">
-        <h2 className="text-xl font-semibold">{title}</h2>
+      <span className="text-sm  px-2">{dateAndAuthor}</span>
+      <div className="px-2 pb-4 flex flex-col gap-1 h-full w-full">
+        <h2
+          className="text-xl font-semibold text-ellipsis line-clamp-3"
+          title={title}
+        >
+          {title}
+        </h2>
         <p className="text-ellipsis text-md line-clamp-3">{description}</p>
         <a
           href={url}
@@ -33,9 +44,6 @@ const NewsCard: React.FC<NewsCardProps> = ({
         >
           Read more
         </a>
-        <span className="text-sm text-gray-600 mt-auto ml-auto">
-          Published on {new Date(publishedAt).toLocaleDateString()}
-        </span>
       </div>
     </article>
   );
