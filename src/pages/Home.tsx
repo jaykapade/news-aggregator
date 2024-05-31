@@ -13,22 +13,18 @@ const HomePage: React.FC = () => {
   const [query, setQuery] = useState<any>({
     search: "",
     category: "",
-    source: "newsOrgApi",
+    source: "gaurdianAPI",
     from: "",
     to: "",
+    pageSize: PAGE_SIZE,
+    page: 1,
   });
 
   useEffect(() => {
     async function fetchData() {
-      const params: any = { country: "us", pageSize: PAGE_SIZE, page: 1 };
-      if (query.search) params["q"] = query.search;
-      if (query.category) params["category"] = query.category;
-      // if (query.source) params["sources"] = query.source;
-      if (query.from) params["from"] = query.from;
-      if (query.to) params["to"] = query.to;
       setIsLoading(true);
       try {
-        const data = await getNews(params, query.source);
+        const data = await getNews(query);
         setArticles(data.articles);
         console.log("data", data);
         setOffset(1);
@@ -45,15 +41,9 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const params: any = { country: "us", pageSize: PAGE_SIZE, page: offset };
-      if (query.search) params["q"] = query.search;
-      if (query.category) params["category"] = query.category;
-      // if (query.source) params["sources"] = query.source;
-      if (query.from) params["from"] = query.from;
-      if (query.to) params["to"] = query.to;
       try {
         setIsLoading(true);
-        const data = await getNews(params, query.source);
+        const data = await getNews({ ...query, page: offset });
         setArticles((prev) => [...prev, ...data.articles]);
         console.log("data", data);
         setTotalResults(data.totalResults);
@@ -90,7 +80,7 @@ const HomePage: React.FC = () => {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [totalResults, offset]);
+  }, [totalResults, offset, isLoading]);
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -141,16 +131,15 @@ const HomePage: React.FC = () => {
         </select>
         <select
           value={query.source}
-          // onChange={(e) =>
-          //   setQuery((prev) => ({ ...prev, category: e.target.value }))
-          // }
+          onChange={(e) =>
+            setQuery((prev: any) => ({ ...prev, source: e.target.value }))
+          }
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
         >
-          <option value="newsapi.org">NewsApi.org</option>
-          <option value="newsapi.com">NewsApi.com</option>
+          <option value="newsOrgApi">NewsApi.org</option>
+          <option value="newsApi">NewsApi.com</option>
           <option value="guardian">Guardian</option>
-          <option value="newyork">Newyork Times</option>
-          <option value="gnews">GNews</option>
+          <option value="newyorkApi">Newyork Times</option>
         </select>
         <button
           onClick={() => {
