@@ -7,15 +7,11 @@ import { getNews } from "../api/news";
 import { debounce } from "../utils";
 import { ArticleProps, QueryProps } from "../types";
 import EmptyState from "../components/EmptyState";
+import UserPreference from "../components/UserPreference";
+import { categories, sources } from "../constants";
+import useLocalStorage from "../hooks/uselocalStorage";
 
 const PAGE_SIZE = 5;
-
-const sources = [
-  { label: "NewsApi.org", value: "newsOrgApi" },
-  { label: "NewsApi.com", value: "newsApi" },
-  { label: "The New York Times", value: "newyorkApi" },
-  { label: "The Guardian", value: "guardianApi" },
-];
 
 const baseQuery = {
   search: "",
@@ -29,11 +25,19 @@ const baseQuery = {
 
 const HomePage: React.FC = () => {
   const loaderRef = useRef(null);
+  const [userPreference] = useLocalStorage("userPreference", {
+    source: "newsOrgApi",
+    category: "",
+  });
   const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [query, setQuery] = useState<QueryProps>(baseQuery);
+  const [query, setQuery] = useState<QueryProps>({
+    ...baseQuery,
+    source: userPreference.source || baseQuery.source,
+    category: userPreference.category || baseQuery.category,
+  });
 
   const handleFilterChange = (key: string, value: string) => {
     if (key === "source") setArticles([]);
@@ -108,7 +112,11 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="p-4 flex flex-col gap-4">
-      <h1 className="text-4xl font-semibold">News App</h1>
+      <div className="flex justify-between gap-2 items-center">
+        <img src="/assets/logo.png" alt="news logo" className="w-12 h-12" />
+        <h1 className="text-2xl font-bold flex-1">Newslify</h1>
+        <UserPreference />
+      </div>
       <div className="flex gap-2 flex-wrap">
         <input
           type="search"
@@ -138,21 +146,24 @@ const HomePage: React.FC = () => {
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
           disabled={query.source === "guardianApi"}
         >
-          <option value="">Select a Category</option>
-          <option value="business">Business</option>
-          <option value="entertainment">Entertainment</option>
-          <option value="general">General</option>
-          <option value="health">Health</option>
-          <option value="science">Science</option>
-          <option value="sports">Sports</option>
-          <option value="technology">Technology</option>
+          <option value={query.category || ""}>
+            {categories.find((s) => s.value === query.category)?.label ||
+              "Select a Category"}
+          </option>
+          {categories
+            .filter((c) => c.value !== query.category)
+            .map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
         </select>
         <select
           value={query.source}
           onChange={(e) => handleFilterChange("source", e.target.value)}
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
         >
-          <option value="">
+          <option value={query.source || ""}>
             {sources.find((s) => s.value === query.source)?.label ||
               "Select a Source"}
           </option>
