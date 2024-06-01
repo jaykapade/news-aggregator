@@ -1,15 +1,8 @@
 import React from "react";
 
-type NewsCardProps = {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  publishedAt: string;
-  author?: string;
-};
+import { ArticleProps } from "../types";
 
-const NewsCard: React.FC<NewsCardProps> = ({
+const NewsCard: React.FC<ArticleProps> = ({
   title,
   description,
   url,

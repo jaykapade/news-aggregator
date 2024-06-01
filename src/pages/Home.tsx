@@ -1,24 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
+
 import NewsCard from "../components/NewsCard";
-import { getNews } from "../api/news";
 import Loader from "../components/Loader";
 
+import { getNews } from "../api/news";
+import { debounce } from "../utils";
+import { ArticleProps, QueryProps } from "../types";
+
+const PAGE_SIZE = 5;
+
+const sources = [
+  { label: "NewsApi.org", value: "newsOrgApi" },
+  { label: "NewsApi.com", value: "newsApi" },
+  { label: "The New York Times", value: "newyorkApi" },
+  { label: "The Guardian", value: "guardianApi" },
+];
+
+const baseQuery = {
+  search: "",
+  category: "",
+  source: "guardianApi",
+  from: "",
+  to: "",
+  pageSize: PAGE_SIZE,
+  page: 1,
+};
+
 const HomePage: React.FC = () => {
-  const PAGE_SIZE = 5;
   const loaderRef = useRef(null);
-  const [articles, setArticles] = useState<any[]>([]);
+  const [articles, setArticles] = useState<ArticleProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [query, setQuery] = useState<any>({
-    search: "",
-    category: "",
-    source: "gaurdianAPI",
-    from: "",
-    to: "",
-    pageSize: PAGE_SIZE,
-    page: 1,
-  });
+  const [query, setQuery] = useState<QueryProps>(baseQuery);
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (key === "source") setArticles([]);
+    setQuery((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const debouncedFilterChange = debounce(handleFilterChange, 500);
 
   useEffect(() => {
     async function fetchData() {
@@ -57,6 +78,7 @@ const HomePage: React.FC = () => {
     if (offset > 1) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset]);
 
   useEffect(() => {
@@ -77,6 +99,7 @@ const HomePage: React.FC = () => {
 
     return () => {
       if (loaderRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(loaderRef.current);
       }
     };
@@ -88,36 +111,27 @@ const HomePage: React.FC = () => {
       <div className="flex gap-2 flex-wrap">
         <input
           type="search"
-          value={query.search}
-          onChange={(e) => {
-            setQuery((prev) => ({ ...prev, search: e.target.value }));
-          }}
+          onChange={(e) => debouncedFilterChange("search", e.target.value)}
           placeholder="Search for articles..."
           className="p-2 border border-gray-300 rounded w-full"
         />
         <input
           type="date"
           value={query.from}
-          onChange={(e) => {
-            setQuery((prev) => ({ ...prev, from: e.target.value }));
-          }}
-          placeholder="Search for articles..."
+          onChange={(e) => handleFilterChange("from", e.target.value)}
+          placeholder="Pubished After"
           className="p-2 border border-gray-300 rounded min-w-[10rem]"
         />
         <input
           type="date"
           value={query.to}
-          onChange={(e) => {
-            setQuery((prev) => ({ ...prev, to: e.target.value }));
-          }}
-          placeholder="Search for articles..."
+          onChange={(e) => handleFilterChange("to", e.target.value)}
+          placeholder="Published Before"
           className="p-2 border border-gray-300 rounded min-w-[10rem]"
         />
         <select
           value={query.category}
-          onChange={(e) =>
-            setQuery((prev) => ({ ...prev, category: e.target.value }))
-          }
+          onChange={(e) => handleFilterChange("category", e.target.value)}
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
         >
           <option value="">Select a Category</option>
@@ -131,25 +145,24 @@ const HomePage: React.FC = () => {
         </select>
         <select
           value={query.source}
-          onChange={(e) =>
-            setQuery((prev: any) => ({ ...prev, source: e.target.value }))
-          }
+          onChange={(e) => handleFilterChange("source", e.target.value)}
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
         >
-          <option value="newsOrgApi">NewsApi.org</option>
-          <option value="newsApi">NewsApi.com</option>
-          <option value="guardian">Guardian</option>
-          <option value="newyorkApi">Newyork Times</option>
+          <option value="">
+            {sources.find((s) => s.value === query.source)?.label ||
+              "Select a Source"}
+          </option>
+          {sources
+            .filter((s) => s.value !== query.source)
+            .map((source) => (
+              <option key={source.value} value={source.value}>
+                {source.label}
+              </option>
+            ))}
         </select>
         <button
           onClick={() => {
-            setQuery({
-              search: "",
-              category: "",
-              source: "",
-              from: "",
-              to: "",
-            });
+            setQuery({ ...baseQuery, page: query.page });
           }}
           className="p-2 border border-gray-300 rounded w-full max-w-[8rem]"
         >
