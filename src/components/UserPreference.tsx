@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import useLocalStorage from "../hooks/uselocalStorage";
 import { categories, sources } from "../constants";
 import { QueryProps } from "../types";
@@ -8,6 +10,7 @@ const basePreference = {
   category: "",
 };
 const UserPreference = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const [preferences, setPreferences] = useLocalStorage<Partial<QueryProps>>(
@@ -26,6 +29,13 @@ const UserPreference = () => {
 
   const resetPreferences = () => {
     setValue(basePreference);
+    navigate(0);
+  };
+
+  const applyPreferences = () => {
+    setPreferences(value);
+    toggleModel();
+    navigate(0);
   };
 
   return (
@@ -38,7 +48,7 @@ const UserPreference = () => {
       </button>
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 ">
-          <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-xl relative min-w-[40vw]">
+          <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-2xl  relative min-w-[80vw] md:min-w-[40vw]">
             <div className="flex justify-between">
               <h2 className=" text-lg md:text-2xl font-semibold">
                 User Preferences
@@ -99,10 +109,7 @@ const UserPreference = () => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  setPreferences(value);
-                  toggleModel();
-                }}
+                onClick={applyPreferences}
                 className="p-2 w-fit  text-sm md:text-md bg-gray-800 text-white rounded-md"
               >
                 Apply

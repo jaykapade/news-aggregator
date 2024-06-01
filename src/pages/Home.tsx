@@ -11,12 +11,12 @@ import UserPreference from "../components/UserPreference";
 import { categories, sources } from "../constants";
 import useLocalStorage from "../hooks/uselocalStorage";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 const baseQuery = {
   search: "",
   category: "",
-  source: "guardianApi",
+  source: "newsOrgApi",
   from: "",
   to: "",
   pageSize: PAGE_SIZE,
@@ -54,7 +54,7 @@ const HomePage: React.FC = () => {
         setArticles(data.articles);
         console.log("data", data);
         setOffset(1);
-        setTotalResults(data.totalResults);
+        setTotalResults(data.totalResults || 0);
       } catch (error) {
         console.error(error);
       } finally {
@@ -117,69 +117,99 @@ const HomePage: React.FC = () => {
         <h1 className="text-2xl font-bold flex-1">Newslify</h1>
         <UserPreference />
       </div>
-      <div className="flex gap-2 flex-wrap">
-        <input
-          type="search"
-          onChange={(e) => debouncedFilterChange("search", e.target.value)}
-          placeholder="Search for articles..."
-          className="p-2 border border-gray-300 rounded w-full"
-        />
-        <input
-          type="date"
-          value={query.from || "Pubished After"}
-          onChange={(e) => handleFilterChange("from", e.target.value)}
-          placeholder="Pubished After"
-          className="p-2 border border-gray-300 rounded min-w-full md:min-w-[10rem]"
-          max={query.to || new Date().toISOString().split("T")[0]}
-        />
-        <input
-          type="date"
-          value={query.to}
-          onChange={(e) => handleFilterChange("to", e.target.value)}
-          placeholder="Published Before"
-          className="p-2 border border-gray-300 rounded min-w-full md:min-w-[10rem]"
-          min={query.from || new Date().toISOString().split("T")[0]}
-        />
-        <select
-          value={query.category}
-          onChange={(e) => handleFilterChange("category", e.target.value)}
-          className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
-          disabled={query.source === "guardianApi"}
-        >
-          <option value={query.category || ""}>
-            {categories.find((s) => s.value === query.category)?.label ||
-              "Select a Category"}
-          </option>
-          {categories
-            .filter((c) => c.value !== query.category)
-            .map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-        </select>
-        <select
-          value={query.source}
-          onChange={(e) => handleFilterChange("source", e.target.value)}
-          className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
-        >
-          <option value={query.source || ""}>
-            {sources.find((s) => s.value === query.source)?.label ||
-              "Select a Source"}
-          </option>
-          {sources
-            .filter((s) => s.value !== query.source)
-            .map((source) => (
-              <option key={source.value} value={source.value}>
-                {source.label}
-              </option>
-            ))}
-        </select>
+      <div className="flex gap-2 flex-wrap lg:flex-nowrap">
+        <div className="relative w-full">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search articles..."
+            onChange={(e) => debouncedFilterChange("search", e.target.value)}
+            className="px-2 pb-2 pt-6 border border-gray-300 rounded w-full text-sm peer"
+          />
+          <label htmlFor="search" className="absolute text-xs top-1 left-1">
+            Search articles
+          </label>
+        </div>
+        <div className="relative min-w-full md:min-w-[10rem]">
+          <input
+            id="for"
+            type="date"
+            value={query.from}
+            onChange={(e) => handleFilterChange("from", e.target.value)}
+            placeholder="Pubished After"
+            className="px-2.5 pb-2.5 pt-5 border border-gray-300 rounded w-full text-sm peer"
+            max={query.to || new Date().toISOString().split("T")[0]}
+          />
+          <label htmlFor="for" className="absolute text-xs top-1 left-1">
+            From
+          </label>
+        </div>
+        <div className="relative min-w-full md:min-w-[10rem]">
+          <input
+            id="to"
+            type="date"
+            value={query.to}
+            onChange={(e) => handleFilterChange("to", e.target.value)}
+            placeholder="Published Before"
+            className="px-2.5 pb-2.5 pt-5 border border-gray-300 rounded w-full text-sm peer"
+            min={query.from || new Date().toISOString().split("T")[0]}
+          />
+          <label htmlFor="to" className="absolute text-xs top-1 left-1">
+            To
+          </label>
+        </div>
+        <div className="relative min-w-full md:min-w-[10rem]">
+          <select
+            id="category"
+            value={query.category}
+            onChange={(e) => handleFilterChange("category", e.target.value)}
+            className="px-2.5 pb-2.5 pt-5 border border-gray-300 rounded w-full text-sm peer"
+            disabled={query.source === "guardianApi"}
+          >
+            <option value={query.category || ""}>
+              {categories.find((s) => s.value === query.category)?.label ||
+                "Select a Category"}
+            </option>
+            {categories
+              .filter((c) => c.value !== query.category)
+              .map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+          </select>
+          <label htmlFor="category" className="absolute text-xs top-1 left-1">
+            Category
+          </label>
+        </div>
+        <div className="relative min-w-full md:min-w-[12rem]">
+          <select
+            id="source"
+            value={query.source}
+            onChange={(e) => handleFilterChange("source", e.target.value)}
+            className="px-2.5 pb-2.5 pt-5 border border-gray-300 rounded w-full text-sm peer"
+          >
+            <option value={query.source || ""}>
+              {sources.find((s) => s.value === query.source)?.label ||
+                "Select a Source"}
+            </option>
+            {sources
+              .filter((s) => s.value !== query.source)
+              .map((source) => (
+                <option key={source.value} value={source.value}>
+                  {source.label}
+                </option>
+              ))}
+          </select>
+          <label htmlFor="source" className="absolute text-xs top-1 left-1">
+            Source
+          </label>
+        </div>
         <button
           onClick={() => {
             setQuery({ ...baseQuery, page: query.page });
           }}
-          className="p-2 border border-gray-300 rounded w-full max-w-[8rem]"
+          className="border border-gray-300 w-full max-w-[6rem] rounded-md text-sm h-12 "
         >
           Clear Filters
         </button>

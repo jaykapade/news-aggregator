@@ -18,7 +18,7 @@ const NewsCard: React.FC<ArticleProps> = ({
       <img
         src={urlToImage || "https://placehold.co/600x400"}
         alt={title}
-        className="object-cover h-[16rem] max-h-[16rem] min-h-[16rem]"
+        className="object-cover h-[12rem] max-h-[12rem] min-h-[12rem]"
       />
       <span className="text-sm  px-2">{dateAndAuthor}</span>
       <div className="px-2 pb-4 flex flex-col gap-1 h-full w-full">
