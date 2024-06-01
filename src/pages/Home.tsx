@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import { getNews } from "../api/news";
 import { debounce } from "../utils";
 import { ArticleProps, QueryProps } from "../types";
+import EmptyState from "../components/EmptyState";
 
 const PAGE_SIZE = 5;
 
@@ -121,6 +122,7 @@ const HomePage: React.FC = () => {
           onChange={(e) => handleFilterChange("from", e.target.value)}
           placeholder="Pubished After"
           className="p-2 border border-gray-300 rounded min-w-[10rem]"
+          max={query.to || new Date().toISOString().split("T")[0]}
         />
         <input
           type="date"
@@ -128,11 +130,13 @@ const HomePage: React.FC = () => {
           onChange={(e) => handleFilterChange("to", e.target.value)}
           placeholder="Published Before"
           className="p-2 border border-gray-300 rounded min-w-[10rem]"
+          min={query.from || new Date().toISOString().split("T")[0]}
         />
         <select
           value={query.category}
           onChange={(e) => handleFilterChange("category", e.target.value)}
           className="p-2 border border-gray-300 rounded flex-1 max-w-[24rem]"
+          disabled={query.source === "guardianApi"}
         >
           <option value="">Select a Category</option>
           <option value="business">Business</option>
@@ -169,6 +173,7 @@ const HomePage: React.FC = () => {
           Clear Filters
         </button>
       </div>
+      {articles?.length < 1 && !isLoading && <EmptyState />}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
         {articles.map((article, index) => (
           <NewsCard key={index} {...article} />
