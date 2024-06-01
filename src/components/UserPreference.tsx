@@ -32,7 +32,7 @@ const UserPreference = () => {
     <>
       <button
         onClick={toggleModel}
-        className="bg-gray-800 text-white font-bold py-2 px-4 rounded w-fit"
+        className="bg-gray-800 text-white font-semibold py-1 px-2 md:py-2 md:px-4 rounded w-fit"
       >
         User Preferences
       </button>
@@ -40,7 +40,9 @@ const UserPreference = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50 ">
           <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-xl relative min-w-[40vw]">
             <div className="flex justify-between">
-              <h2 className="text-2xl font-semibold">User Preferences</h2>
+              <h2 className=" text-lg md:text-2xl font-semibold">
+                User Preferences
+              </h2>
               <button
                 className="text-bold text-sm text-red-500"
                 onClick={resetPreferences}
@@ -48,7 +50,9 @@ const UserPreference = () => {
                 Reset
               </button>
             </div>{" "}
-            <p className="text-sm">Please select your preferred source</p>
+            <p className="text-xs md:text-sm">
+              Please select your preferred source
+            </p>
             <select
               value={value.source}
               onChange={(e) => handleChange("source", e.target.value)}
@@ -66,7 +70,9 @@ const UserPreference = () => {
                   </option>
                 ))}
             </select>
-            <p className="text-sm">Please select your preferred category</p>
+            <p className="text-xs md:text-sm">
+              Please select your preferred category
+            </p>
             <select
               value={value.category}
               onChange={(e) => handleChange("category", e.target.value)}
@@ -88,7 +94,7 @@ const UserPreference = () => {
               {" "}
               <button
                 onClick={toggleModel}
-                className="p-2 w-fit text-md border border-gray-500 rounded-md"
+                className="p-2 w-fit text-sm md:text-md border border-gray-500 rounded-md"
               >
                 Cancel
               </button>
@@ -97,7 +103,7 @@ const UserPreference = () => {
                   setPreferences(value);
                   toggleModel();
                 }}
-                className="p-2 w-fit text-md bg-gray-800 text-white rounded-md"
+                className="p-2 w-fit  text-sm md:text-md bg-gray-800 text-white rounded-md"
               >
                 Apply
               </button>

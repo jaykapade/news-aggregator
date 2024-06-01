@@ -1,30 +1,78 @@
-# React + TypeScript + Vite
+# Newslify App: A news aggregator app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Getting Started Locally
 
-Currently, two official plugins are available:
+1. **Clone the Repository**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+   ```bash
+   git clone https://github.com/jaykapade/news-aggregator.git
+   ```
 
-## Expanding the ESLint configuration
+2. **Install Dependencies**
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+   ```bash
+   cd project-folder
+   npm install
+   ```
 
-- Configure the top-level `parserOptions` property like this:
+3. **Run Development Server**
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+   ```bash
+    npm run dev
+   ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Building for Production
+
+1. **Build the Project**
+
+   ```bash
+   npm run build
+   ```
+
+2. **Serve the Production Build**
+
+   ```bash
+   cd project-folder
+   npm install
+   ```
+
+   This will serve the production build locally for testing.
+
+## Building the Docker Image
+
+1. **Use the Docker image in root directory**
+
+   ```Dockerfile
+   # Use a slim Node.js image as the base
+   FROM node:18-alpine
+
+    # Set the working directory for the container
+    WORKDIR /app
+
+    # Copy package.json and package-lock.json for dependency installation
+    COPY package\*.json ./
+
+    # Install dependencies with npm
+    RUN npm install
+
+    # Copy the rest of the application code
+    COPY . .
+
+    # Expose the port Vite uses by default (can be changed in vite.config.js)
+    EXPOSE 3000
+
+    # Start the development server
+    CMD ["npm", "run", "dev"]
+   ```
+
+2. **Build the Image**
+
+   ```bash
+   docker build -t my-react-vite-image .
+   ```
+
+3. **Run the Container**
+
+   ```bash
+   docker run -d -p 3000:3000 --name react-vite-container react-vite-image
+   ```

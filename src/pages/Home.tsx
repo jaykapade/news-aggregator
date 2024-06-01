@@ -126,10 +126,10 @@ const HomePage: React.FC = () => {
         />
         <input
           type="date"
-          value={query.from}
+          value={query.from || "Pubished After"}
           onChange={(e) => handleFilterChange("from", e.target.value)}
           placeholder="Pubished After"
-          className="p-2 border border-gray-300 rounded min-w-[10rem]"
+          className="p-2 border border-gray-300 rounded min-w-full md:min-w-[10rem]"
           max={query.to || new Date().toISOString().split("T")[0]}
         />
         <input
@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
           value={query.to}
           onChange={(e) => handleFilterChange("to", e.target.value)}
           placeholder="Published Before"
-          className="p-2 border border-gray-300 rounded min-w-[10rem]"
+          className="p-2 border border-gray-300 rounded min-w-full md:min-w-[10rem]"
           min={query.from || new Date().toISOString().split("T")[0]}
         />
         <select
