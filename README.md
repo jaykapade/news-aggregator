@@ -58,7 +58,7 @@
     # Copy the rest of the application code
     COPY . .
 
-    # Expose the port Vite uses by default (can be changed in vite.config.js)
+    # Expose the port configured in vite.config.js
     EXPOSE 3000
 
     # Start the development server
