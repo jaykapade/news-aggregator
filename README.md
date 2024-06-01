@@ -1,5 +1,7 @@
 # Newslify App: A news aggregator app
 
+A news aggregator platform, that takes data from [newsApi.org](https://www.thenewsapi.com/documentation), [newsApi.org](https://newsapi.org/docs), [The Guardian](https://open-platform.theguardian.com/documentation/) and [The Newyork times](https://developer.nytimes.com/docs/articlesearch-product/1/overview). With user preference selection, infinite loading and filters.
+
 ## Getting Started Locally
 
 1. **Clone the Repository**
